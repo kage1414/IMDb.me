@@ -4,26 +4,20 @@ let start;
 let totalRecords = 0;
 let insertedTotal = 0;
 
-const clearLastLine = () => {
-  process.stdout.moveCursor(0, -1);
-  process.stdout.clearLine(1);
-};
-
 module.exports = {
   logProgress: () => {
     const durationMilliseconds = Date.now() - start;
     const rate = insertedTotal / durationMilliseconds;
     const recordsLeft = totalRecords - insertedTotal;
     const estimatedFinish = Math.round(Date.now() + recordsLeft / rate);
-    clearLastLine();
-    console.log(
-      `Inserted ${insertedTotal} records of ${totalRecords} - ${Math.round(
-        insertedTotal / totalRecords
-      )}% - ${Math.round(rate * 1000)} records/sec - ${countdown(
-        null,
-        new Date(estimatedFinish)
-      ).toString()} left`
-    );
+    const message = `Inserted ${insertedTotal} records of ${totalRecords} - ${Math.round(
+      insertedTotal / totalRecords
+    )}% - ${Math.round(rate * 1000)} records/sec - ${countdown(
+      null,
+      new Date(estimatedFinish)
+    ).toString()} left`;
+    console.clear();
+    console.log(message);
   },
   startTimer: () => {
     if (!start) {
