@@ -1,4 +1,4 @@
-const { tables, sequelize, MODELS } = require('./scrape-imdb.js');
+const { tables, sequelize, MODELS } = require('./db.js');
 const axios = require('axios');
 const gunzip = require('gunzip-file');
 const Table = require('./table.js');
@@ -15,12 +15,36 @@ const {
   existsSync,
   mkdirSync,
 } = require('fs');
-const arrayFields = ['genres', 'knownForTitles', 'primaryProfession'];
+const arrayFields = [
+  'genres',
+  'knownForTitles',
+  'primaryProfession',
+  'attributes',
+  'types',
+  'directors',
+  'writers',
+];
+const booleanFields = ['isAdult', 'isOriginalTitle'];
 
-const download = async ({ url, zippedFileName, fileName, model }) => {
-  const zippedOutputLocationPath = path.join('.', 'temp', zippedFileName);
-  const outputLocationPath = path.join('.', 'temp', fileName);
-  const writer = createWriteStream(zippedOutputLocationPath);
+const download = async ({
+  url,
+  zippedFileName,
+  fileName,
+  model,
+}) => {
+  const zippedOutputLocationPath = path.join(
+    '.',
+    'temp',
+    zippedFileName
+  );
+  const outputLocationPath = path.join(
+    '.',
+    'temp',
+    fileName
+  );
+  const writer = createWriteStream(
+    zippedOutputLocationPath
+  );
   await axios({
     url,
     method: 'GET',
@@ -42,13 +66,17 @@ const download = async ({ url, zippedFileName, fileName, model }) => {
     });
   });
 
-  await gunzip(zippedOutputLocationPath, outputLocationPath, () => {
-    countTotalRecords(outputLocationPath, {
-      deleteFile: true,
-      deleteFilePath: zippedOutputLocationPath,
-    });
-    parseFileToCSV(outputLocationPath, model);
-  });
+  await gunzip(
+    zippedOutputLocationPath,
+    outputLocationPath,
+    () => {
+      countTotalRecords(outputLocationPath, {
+        deleteFile: true,
+        deleteFilePath: zippedOutputLocationPath,
+      });
+      parseFileToCSV(outputLocationPath, model);
+    }
+  );
 };
 
 const parseFileToCSV = async (filePath, model) => {
@@ -79,7 +107,7 @@ const parseFileToCSV = async (filePath, model) => {
           let value = cell;
           if (cell === '\\N') {
             value = null;
-          } else if (key === 'isAdult') {
+          } else if (booleanFields.includes(key)) {
             value = !!Number(value);
           } else if (arrayFields.includes(key)) {
             value = cell.split(',');
