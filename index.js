@@ -1,4 +1,5 @@
-const { tables, sequelize, MODELS } = require('./db.js');
+const { tables } = require('./db.js');
+const { sequelize, models } = require('./models.js');
 const axios = require('axios');
 const gunzip = require('gunzip-file');
 const Table = require('./table.js');
@@ -136,8 +137,9 @@ const parseFileToCSV = async (filePath, model) => {
 
 const runner = async () => {
   console.log('Cloning IMDB Database');
-  await MODELS.BASICS_NAME.drop();
-  await MODELS.BASICS_TITLE.drop();
+  Object.values(models).forEach(async (model) => {
+    await model.drop();
+  });
   await sequelize.sync();
   if (!existsSync('temp')) {
     mkdirSync('temp');
