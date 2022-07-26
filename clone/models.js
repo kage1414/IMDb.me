@@ -153,13 +153,15 @@ const models = {
   }),
 };
 
-models.NAME.hasMany(models.AKAS, {
-  foreignKey: 'titleId',
-});
+// models.NAME.hasMany(models.AKAS, {
+//   foreignKey: 'titleId',
+//   onDelete: 'cascade',
+// });
 
-models.NAME.belongsTo(models.CREW, {
-  foreignKey: 'tconst',
-});
+// models.NAME.belongsTo(models.CREW, {
+//   foreignKey: 'tconst',
+//   onDelete: 'cascade',
+// });
 
 module.exports = {
   models,

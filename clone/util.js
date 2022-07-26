@@ -9,15 +9,21 @@ module.exports = {
     const durationMilliseconds = Date.now() - start;
     const rate = insertedTotal / durationMilliseconds;
     const recordsLeft = totalRecords - insertedTotal;
-    const estimatedFinish = Math.round(Date.now() + recordsLeft / rate);
-    const message = `Inserted ${insertedTotal} records of ${totalRecords} - ${Math.round(
+    const estimatedFinish = Math.round(
+      Date.now() + recordsLeft / rate
+    );
+    const totalRecordsMessage = `Total records: ${totalRecords}`;
+    const insertMessage = `Inserted ${insertedTotal} records of ${totalRecords} - ${Math.round(
       insertedTotal / totalRecords
-    )}% - ${Math.round(rate * 1000)} records/sec - ${countdown(
+    )}% - ${Math.round(
+      rate * 1000
+    )} records/sec - ${countdown(
       null,
       new Date(estimatedFinish)
     ).toString()} left`;
     console.clear();
-    console.log(message);
+    console.log(totalRecordsMessage);
+    console.log(insertMessage);
   },
   startTimer: () => {
     if (!start) {
@@ -27,7 +33,10 @@ module.exports = {
   addToInsertTotal: (num) => {
     insertedTotal += num;
   },
-  countTotalRecords: (filePath, { deleteFile, deleteFilePath }) => {
+  countTotalRecords: (
+    filePath,
+    { deleteFile, deleteFilePath }
+  ) => {
     const stream = createReadStream(filePath, {
       encoding: 'utf8',
     });
@@ -44,9 +53,13 @@ module.exports = {
       }
       left = chunkArr.pop();
       totalRecords += chunkArr.length;
+      module.exports.logProgress();
     });
-    if (deleteFile) {
-      unlink(deleteFilePath, () => {});
-    }
+    stream.on('close', () => {
+      if (deleteFile) {
+        unlink(filePath, () => {});
+        unlink(deleteFilePath, () => {});
+      }
+    });
   },
 };
