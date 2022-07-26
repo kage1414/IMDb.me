@@ -152,4 +152,5 @@ const runner = async () => {
   tablesToScrape.forEach(download);
 };
 
+require('./createDatabase.js');
 runner();

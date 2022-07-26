@@ -1,18 +1,14 @@
 require('dot-env');
-const {
-  IMDB_DB_USER,
-  IMDB_DB_PASS,
-  IMDB_DB_DMS,
-  IMDB_DB_HOST,
-} = process.env;
+const { IMDB_USER, IMDB_PASS, IMDB_DBMS, IMDB_HOST } =
+  process.env;
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize(
   'imdb',
-  IMDB_DB_USER,
-  IMDB_DB_PASS,
+  IMDB_USER,
+  IMDB_PASS,
   {
-    host: IMDB_DB_HOST || 'localhost',
-    dialect: IMDB_DB_DMS || 'postgres',
+    host: IMDB_HOST || 'localhost',
+    dialect: IMDB_DBMS || 'postgres',
     logging: false,
   }
 );
