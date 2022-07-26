@@ -8,3 +8,6 @@ import (
 
 // Name is the predicate function for name builders.
 type Name func(*sql.Selector)
+
+// Title is the predicate function for title builders.
+type Title func(*sql.Selector)

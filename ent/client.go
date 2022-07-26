@@ -10,6 +10,7 @@ import (
 	"imdb-db/ent/migrate"
 
 	"imdb-db/ent/name"
+	"imdb-db/ent/title"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -22,6 +23,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Name is the client for interacting with the Name builders.
 	Name *NameClient
+	// Title is the client for interacting with the Title builders.
+	Title *TitleClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -36,6 +39,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Name = NewNameClient(c.config)
+	c.Title = NewTitleClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -70,6 +74,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:    ctx,
 		config: cfg,
 		Name:   NewNameClient(cfg),
+		Title:  NewTitleClient(cfg),
 	}, nil
 }
 
@@ -90,6 +95,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:    ctx,
 		config: cfg,
 		Name:   NewNameClient(cfg),
+		Title:  NewTitleClient(cfg),
 	}, nil
 }
 
@@ -120,6 +126,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Name.Use(hooks...)
+	c.Title.Use(hooks...)
 }
 
 // NameClient is a client for the Name schema.
@@ -210,4 +217,94 @@ func (c *NameClient) GetX(ctx context.Context, id int) *Name {
 // Hooks returns the client hooks.
 func (c *NameClient) Hooks() []Hook {
 	return c.hooks.Name
+}
+
+// TitleClient is a client for the Title schema.
+type TitleClient struct {
+	config
+}
+
+// NewTitleClient returns a client for the Title from the given config.
+func NewTitleClient(c config) *TitleClient {
+	return &TitleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `title.Hooks(f(g(h())))`.
+func (c *TitleClient) Use(hooks ...Hook) {
+	c.hooks.Title = append(c.hooks.Title, hooks...)
+}
+
+// Create returns a builder for creating a Title entity.
+func (c *TitleClient) Create() *TitleCreate {
+	mutation := newTitleMutation(c.config, OpCreate)
+	return &TitleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Title entities.
+func (c *TitleClient) CreateBulk(builders ...*TitleCreate) *TitleCreateBulk {
+	return &TitleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Title.
+func (c *TitleClient) Update() *TitleUpdate {
+	mutation := newTitleMutation(c.config, OpUpdate)
+	return &TitleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TitleClient) UpdateOne(t *Title) *TitleUpdateOne {
+	mutation := newTitleMutation(c.config, OpUpdateOne, withTitle(t))
+	return &TitleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TitleClient) UpdateOneID(id int) *TitleUpdateOne {
+	mutation := newTitleMutation(c.config, OpUpdateOne, withTitleID(id))
+	return &TitleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Title.
+func (c *TitleClient) Delete() *TitleDelete {
+	mutation := newTitleMutation(c.config, OpDelete)
+	return &TitleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TitleClient) DeleteOne(t *Title) *TitleDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *TitleClient) DeleteOneID(id int) *TitleDeleteOne {
+	builder := c.Delete().Where(title.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TitleDeleteOne{builder}
+}
+
+// Query returns a query builder for Title.
+func (c *TitleClient) Query() *TitleQuery {
+	return &TitleQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Title entity by its id.
+func (c *TitleClient) Get(ctx context.Context, id int) (*Title, error) {
+	return c.Query().Where(title.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TitleClient) GetX(ctx context.Context, id int) *Title {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TitleClient) Hooks() []Hook {
+	return c.hooks.Title
 }

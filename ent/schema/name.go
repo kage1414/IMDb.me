@@ -20,6 +20,7 @@ func (Name) Fields() []ent.Field {
 		field.Int("deathYear").
 			Positive(),
 		field.JSON("primaryProfession", []string{}),
+		field.JSON("knownForTitles", []string{}),
 	}
 }
 

@@ -5,6 +5,7 @@ package ent
 import (
 	"imdb-db/ent/name"
 	"imdb-db/ent/schema"
+	"imdb-db/ent/title"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -21,4 +22,22 @@ func init() {
 	nameDescDeathYear := nameFields[3].Descriptor()
 	// name.DeathYearValidator is a validator for the "deathYear" field. It is called by the builders before save.
 	name.DeathYearValidator = nameDescDeathYear.Validators[0].(func(int) error)
+	titleFields := schema.Title{}.Fields()
+	_ = titleFields
+	// titleDescIsAdult is the schema descriptor for isAdult field.
+	titleDescIsAdult := titleFields[4].Descriptor()
+	// title.DefaultIsAdult holds the default value on creation for the isAdult field.
+	title.DefaultIsAdult = titleDescIsAdult.Default.(bool)
+	// titleDescStartYear is the schema descriptor for startYear field.
+	titleDescStartYear := titleFields[5].Descriptor()
+	// title.StartYearValidator is a validator for the "startYear" field. It is called by the builders before save.
+	title.StartYearValidator = titleDescStartYear.Validators[0].(func(int) error)
+	// titleDescEndYear is the schema descriptor for endYear field.
+	titleDescEndYear := titleFields[6].Descriptor()
+	// title.EndYearValidator is a validator for the "endYear" field. It is called by the builders before save.
+	title.EndYearValidator = titleDescEndYear.Validators[0].(func(int) error)
+	// titleDescRuntimeMinutes is the schema descriptor for runtimeMinutes field.
+	titleDescRuntimeMinutes := titleFields[7].Descriptor()
+	// title.RuntimeMinutesValidator is a validator for the "runtimeMinutes" field. It is called by the builders before save.
+	title.RuntimeMinutesValidator = titleDescRuntimeMinutes.Validators[0].(func(int) error)
 }

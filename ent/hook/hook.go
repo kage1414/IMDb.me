@@ -21,6 +21,19 @@ func (f NameFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return f(ctx, mv)
 }
 
+// The TitleFunc type is an adapter to allow the use of ordinary
+// function as Title mutator.
+type TitleFunc func(context.Context, *ent.TitleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TitleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.TitleMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TitleMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

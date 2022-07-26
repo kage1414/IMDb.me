@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"imdb-db/ent/name"
 	"strings"
@@ -23,6 +24,10 @@ type Name struct {
 	BirthYear int `json:"birthYear,omitempty"`
 	// DeathYear holds the value of the "deathYear" field.
 	DeathYear int `json:"deathYear,omitempty"`
+	// PrimaryProfession holds the value of the "primaryProfession" field.
+	PrimaryProfession []string `json:"primaryProfession,omitempty"`
+	// KnownForTitles holds the value of the "knownForTitles" field.
+	KnownForTitles []string `json:"knownForTitles,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -30,6 +35,8 @@ func (*Name) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case name.FieldPrimaryProfession, name.FieldKnownForTitles:
+			values[i] = new([]byte)
 		case name.FieldID, name.FieldBirthYear, name.FieldDeathYear:
 			values[i] = new(sql.NullInt64)
 		case name.FieldTconst, name.FieldPrimaryName:
@@ -79,6 +86,22 @@ func (n *Name) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				n.DeathYear = int(value.Int64)
 			}
+		case name.FieldPrimaryProfession:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field primaryProfession", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.PrimaryProfession); err != nil {
+					return fmt.Errorf("unmarshal field primaryProfession: %w", err)
+				}
+			}
+		case name.FieldKnownForTitles:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field knownForTitles", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.KnownForTitles); err != nil {
+					return fmt.Errorf("unmarshal field knownForTitles: %w", err)
+				}
+			}
 		}
 	}
 	return nil
@@ -118,6 +141,12 @@ func (n *Name) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("deathYear=")
 	builder.WriteString(fmt.Sprintf("%v", n.DeathYear))
+	builder.WriteString(", ")
+	builder.WriteString("primaryProfession=")
+	builder.WriteString(fmt.Sprintf("%v", n.PrimaryProfession))
+	builder.WriteString(", ")
+	builder.WriteString("knownForTitles=")
+	builder.WriteString(fmt.Sprintf("%v", n.KnownForTitles))
 	builder.WriteByte(')')
 	return builder.String()
 }

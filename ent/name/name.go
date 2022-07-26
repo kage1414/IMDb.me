@@ -15,6 +15,10 @@ const (
 	FieldBirthYear = "birth_year"
 	// FieldDeathYear holds the string denoting the deathyear field in the database.
 	FieldDeathYear = "death_year"
+	// FieldPrimaryProfession holds the string denoting the primaryprofession field in the database.
+	FieldPrimaryProfession = "primary_profession"
+	// FieldKnownForTitles holds the string denoting the knownfortitles field in the database.
+	FieldKnownForTitles = "known_for_titles"
 	// Table holds the table name of the name in the database.
 	Table = "names"
 )
@@ -26,6 +30,8 @@ var Columns = []string{
 	FieldPrimaryName,
 	FieldBirthYear,
 	FieldDeathYear,
+	FieldPrimaryProfession,
+	FieldKnownForTitles,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

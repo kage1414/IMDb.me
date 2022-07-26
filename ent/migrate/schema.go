@@ -15,6 +15,8 @@ var (
 		{Name: "primary_name", Type: field.TypeString},
 		{Name: "birth_year", Type: field.TypeInt},
 		{Name: "death_year", Type: field.TypeInt},
+		{Name: "primary_profession", Type: field.TypeJSON},
+		{Name: "known_for_titles", Type: field.TypeJSON},
 	}
 	// NamesTable holds the schema information for the "names" table.
 	NamesTable = &schema.Table{
@@ -22,9 +24,29 @@ var (
 		Columns:    NamesColumns,
 		PrimaryKey: []*schema.Column{NamesColumns[0]},
 	}
+	// TitlesColumns holds the columns for the "titles" table.
+	TitlesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "tconst", Type: field.TypeString},
+		{Name: "title_type", Type: field.TypeString},
+		{Name: "primary_title", Type: field.TypeString},
+		{Name: "original_title", Type: field.TypeString},
+		{Name: "is_adult", Type: field.TypeBool, Default: false},
+		{Name: "start_year", Type: field.TypeInt},
+		{Name: "end_year", Type: field.TypeInt},
+		{Name: "runtime_minutes", Type: field.TypeInt},
+		{Name: "genre", Type: field.TypeJSON},
+	}
+	// TitlesTable holds the schema information for the "titles" table.
+	TitlesTable = &schema.Table{
+		Name:       "titles",
+		Columns:    TitlesColumns,
+		PrimaryKey: []*schema.Column{TitlesColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		NamesTable,
+		TitlesTable,
 	}
 )
 

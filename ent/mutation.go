@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"imdb-db/ent/name"
 	"imdb-db/ent/predicate"
+	"imdb-db/ent/title"
 	"sync"
 
 	"entgo.io/ent"
@@ -22,25 +23,28 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeName = "Name"
+	TypeName  = "Name"
+	TypeTitle = "Title"
 )
 
 // NameMutation represents an operation that mutates the Name nodes in the graph.
 type NameMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	tconst        *string
-	primaryName   *string
-	birthYear     *int
-	addbirthYear  *int
-	deathYear     *int
-	adddeathYear  *int
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Name, error)
-	predicates    []predicate.Name
+	op                Op
+	typ               string
+	id                *int
+	tconst            *string
+	primaryName       *string
+	birthYear         *int
+	addbirthYear      *int
+	deathYear         *int
+	adddeathYear      *int
+	primaryProfession *[]string
+	knownForTitles    *[]string
+	clearedFields     map[string]struct{}
+	done              bool
+	oldValue          func(context.Context) (*Name, error)
+	predicates        []predicate.Name
 }
 
 var _ ent.Mutation = (*NameMutation)(nil)
@@ -325,6 +329,78 @@ func (m *NameMutation) ResetDeathYear() {
 	m.adddeathYear = nil
 }
 
+// SetPrimaryProfession sets the "primaryProfession" field.
+func (m *NameMutation) SetPrimaryProfession(s []string) {
+	m.primaryProfession = &s
+}
+
+// PrimaryProfession returns the value of the "primaryProfession" field in the mutation.
+func (m *NameMutation) PrimaryProfession() (r []string, exists bool) {
+	v := m.primaryProfession
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrimaryProfession returns the old "primaryProfession" field's value of the Name entity.
+// If the Name object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NameMutation) OldPrimaryProfession(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrimaryProfession is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrimaryProfession requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrimaryProfession: %w", err)
+	}
+	return oldValue.PrimaryProfession, nil
+}
+
+// ResetPrimaryProfession resets all changes to the "primaryProfession" field.
+func (m *NameMutation) ResetPrimaryProfession() {
+	m.primaryProfession = nil
+}
+
+// SetKnownForTitles sets the "knownForTitles" field.
+func (m *NameMutation) SetKnownForTitles(s []string) {
+	m.knownForTitles = &s
+}
+
+// KnownForTitles returns the value of the "knownForTitles" field in the mutation.
+func (m *NameMutation) KnownForTitles() (r []string, exists bool) {
+	v := m.knownForTitles
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKnownForTitles returns the old "knownForTitles" field's value of the Name entity.
+// If the Name object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NameMutation) OldKnownForTitles(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKnownForTitles is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKnownForTitles requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKnownForTitles: %w", err)
+	}
+	return oldValue.KnownForTitles, nil
+}
+
+// ResetKnownForTitles resets all changes to the "knownForTitles" field.
+func (m *NameMutation) ResetKnownForTitles() {
+	m.knownForTitles = nil
+}
+
 // Where appends a list predicates to the NameMutation builder.
 func (m *NameMutation) Where(ps ...predicate.Name) {
 	m.predicates = append(m.predicates, ps...)
@@ -344,7 +420,7 @@ func (m *NameMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NameMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 6)
 	if m.tconst != nil {
 		fields = append(fields, name.FieldTconst)
 	}
@@ -356,6 +432,12 @@ func (m *NameMutation) Fields() []string {
 	}
 	if m.deathYear != nil {
 		fields = append(fields, name.FieldDeathYear)
+	}
+	if m.primaryProfession != nil {
+		fields = append(fields, name.FieldPrimaryProfession)
+	}
+	if m.knownForTitles != nil {
+		fields = append(fields, name.FieldKnownForTitles)
 	}
 	return fields
 }
@@ -373,6 +455,10 @@ func (m *NameMutation) Field(name string) (ent.Value, bool) {
 		return m.BirthYear()
 	case name.FieldDeathYear:
 		return m.DeathYear()
+	case name.FieldPrimaryProfession:
+		return m.PrimaryProfession()
+	case name.FieldKnownForTitles:
+		return m.KnownForTitles()
 	}
 	return nil, false
 }
@@ -390,6 +476,10 @@ func (m *NameMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldBirthYear(ctx)
 	case name.FieldDeathYear:
 		return m.OldDeathYear(ctx)
+	case name.FieldPrimaryProfession:
+		return m.OldPrimaryProfession(ctx)
+	case name.FieldKnownForTitles:
+		return m.OldKnownForTitles(ctx)
 	}
 	return nil, fmt.Errorf("unknown Name field %s", name)
 }
@@ -426,6 +516,20 @@ func (m *NameMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeathYear(v)
+		return nil
+	case name.FieldPrimaryProfession:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrimaryProfession(v)
+		return nil
+	case name.FieldKnownForTitles:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKnownForTitles(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Name field %s", name)
@@ -515,6 +619,12 @@ func (m *NameMutation) ResetField(name string) error {
 	case name.FieldDeathYear:
 		m.ResetDeathYear()
 		return nil
+	case name.FieldPrimaryProfession:
+		m.ResetPrimaryProfession()
+		return nil
+	case name.FieldKnownForTitles:
+		m.ResetKnownForTitles()
+		return nil
 	}
 	return fmt.Errorf("unknown Name field %s", name)
 }
@@ -565,4 +675,849 @@ func (m *NameMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *NameMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Name edge %s", name)
+}
+
+// TitleMutation represents an operation that mutates the Title nodes in the graph.
+type TitleMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *int
+	tconst            *string
+	titleType         *string
+	primaryTitle      *string
+	originalTitle     *string
+	isAdult           *bool
+	startYear         *int
+	addstartYear      *int
+	endYear           *int
+	addendYear        *int
+	runtimeMinutes    *int
+	addruntimeMinutes *int
+	genre             *[]string
+	clearedFields     map[string]struct{}
+	done              bool
+	oldValue          func(context.Context) (*Title, error)
+	predicates        []predicate.Title
+}
+
+var _ ent.Mutation = (*TitleMutation)(nil)
+
+// titleOption allows management of the mutation configuration using functional options.
+type titleOption func(*TitleMutation)
+
+// newTitleMutation creates new mutation for the Title entity.
+func newTitleMutation(c config, op Op, opts ...titleOption) *TitleMutation {
+	m := &TitleMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTitle,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTitleID sets the ID field of the mutation.
+func withTitleID(id int) titleOption {
+	return func(m *TitleMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Title
+		)
+		m.oldValue = func(ctx context.Context) (*Title, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Title.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTitle sets the old Title of the mutation.
+func withTitle(node *Title) titleOption {
+	return func(m *TitleMutation) {
+		m.oldValue = func(context.Context) (*Title, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TitleMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TitleMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TitleMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TitleMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Title.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTconst sets the "tconst" field.
+func (m *TitleMutation) SetTconst(s string) {
+	m.tconst = &s
+}
+
+// Tconst returns the value of the "tconst" field in the mutation.
+func (m *TitleMutation) Tconst() (r string, exists bool) {
+	v := m.tconst
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTconst returns the old "tconst" field's value of the Title entity.
+// If the Title object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TitleMutation) OldTconst(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTconst is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTconst requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTconst: %w", err)
+	}
+	return oldValue.Tconst, nil
+}
+
+// ResetTconst resets all changes to the "tconst" field.
+func (m *TitleMutation) ResetTconst() {
+	m.tconst = nil
+}
+
+// SetTitleType sets the "titleType" field.
+func (m *TitleMutation) SetTitleType(s string) {
+	m.titleType = &s
+}
+
+// TitleType returns the value of the "titleType" field in the mutation.
+func (m *TitleMutation) TitleType() (r string, exists bool) {
+	v := m.titleType
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitleType returns the old "titleType" field's value of the Title entity.
+// If the Title object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TitleMutation) OldTitleType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitleType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitleType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitleType: %w", err)
+	}
+	return oldValue.TitleType, nil
+}
+
+// ResetTitleType resets all changes to the "titleType" field.
+func (m *TitleMutation) ResetTitleType() {
+	m.titleType = nil
+}
+
+// SetPrimaryTitle sets the "primaryTitle" field.
+func (m *TitleMutation) SetPrimaryTitle(s string) {
+	m.primaryTitle = &s
+}
+
+// PrimaryTitle returns the value of the "primaryTitle" field in the mutation.
+func (m *TitleMutation) PrimaryTitle() (r string, exists bool) {
+	v := m.primaryTitle
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrimaryTitle returns the old "primaryTitle" field's value of the Title entity.
+// If the Title object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TitleMutation) OldPrimaryTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrimaryTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrimaryTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrimaryTitle: %w", err)
+	}
+	return oldValue.PrimaryTitle, nil
+}
+
+// ResetPrimaryTitle resets all changes to the "primaryTitle" field.
+func (m *TitleMutation) ResetPrimaryTitle() {
+	m.primaryTitle = nil
+}
+
+// SetOriginalTitle sets the "originalTitle" field.
+func (m *TitleMutation) SetOriginalTitle(s string) {
+	m.originalTitle = &s
+}
+
+// OriginalTitle returns the value of the "originalTitle" field in the mutation.
+func (m *TitleMutation) OriginalTitle() (r string, exists bool) {
+	v := m.originalTitle
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOriginalTitle returns the old "originalTitle" field's value of the Title entity.
+// If the Title object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TitleMutation) OldOriginalTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOriginalTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOriginalTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOriginalTitle: %w", err)
+	}
+	return oldValue.OriginalTitle, nil
+}
+
+// ResetOriginalTitle resets all changes to the "originalTitle" field.
+func (m *TitleMutation) ResetOriginalTitle() {
+	m.originalTitle = nil
+}
+
+// SetIsAdult sets the "isAdult" field.
+func (m *TitleMutation) SetIsAdult(b bool) {
+	m.isAdult = &b
+}
+
+// IsAdult returns the value of the "isAdult" field in the mutation.
+func (m *TitleMutation) IsAdult() (r bool, exists bool) {
+	v := m.isAdult
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsAdult returns the old "isAdult" field's value of the Title entity.
+// If the Title object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TitleMutation) OldIsAdult(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsAdult is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsAdult requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsAdult: %w", err)
+	}
+	return oldValue.IsAdult, nil
+}
+
+// ResetIsAdult resets all changes to the "isAdult" field.
+func (m *TitleMutation) ResetIsAdult() {
+	m.isAdult = nil
+}
+
+// SetStartYear sets the "startYear" field.
+func (m *TitleMutation) SetStartYear(i int) {
+	m.startYear = &i
+	m.addstartYear = nil
+}
+
+// StartYear returns the value of the "startYear" field in the mutation.
+func (m *TitleMutation) StartYear() (r int, exists bool) {
+	v := m.startYear
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartYear returns the old "startYear" field's value of the Title entity.
+// If the Title object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TitleMutation) OldStartYear(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartYear is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartYear requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartYear: %w", err)
+	}
+	return oldValue.StartYear, nil
+}
+
+// AddStartYear adds i to the "startYear" field.
+func (m *TitleMutation) AddStartYear(i int) {
+	if m.addstartYear != nil {
+		*m.addstartYear += i
+	} else {
+		m.addstartYear = &i
+	}
+}
+
+// AddedStartYear returns the value that was added to the "startYear" field in this mutation.
+func (m *TitleMutation) AddedStartYear() (r int, exists bool) {
+	v := m.addstartYear
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStartYear resets all changes to the "startYear" field.
+func (m *TitleMutation) ResetStartYear() {
+	m.startYear = nil
+	m.addstartYear = nil
+}
+
+// SetEndYear sets the "endYear" field.
+func (m *TitleMutation) SetEndYear(i int) {
+	m.endYear = &i
+	m.addendYear = nil
+}
+
+// EndYear returns the value of the "endYear" field in the mutation.
+func (m *TitleMutation) EndYear() (r int, exists bool) {
+	v := m.endYear
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndYear returns the old "endYear" field's value of the Title entity.
+// If the Title object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TitleMutation) OldEndYear(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndYear is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndYear requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndYear: %w", err)
+	}
+	return oldValue.EndYear, nil
+}
+
+// AddEndYear adds i to the "endYear" field.
+func (m *TitleMutation) AddEndYear(i int) {
+	if m.addendYear != nil {
+		*m.addendYear += i
+	} else {
+		m.addendYear = &i
+	}
+}
+
+// AddedEndYear returns the value that was added to the "endYear" field in this mutation.
+func (m *TitleMutation) AddedEndYear() (r int, exists bool) {
+	v := m.addendYear
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEndYear resets all changes to the "endYear" field.
+func (m *TitleMutation) ResetEndYear() {
+	m.endYear = nil
+	m.addendYear = nil
+}
+
+// SetRuntimeMinutes sets the "runtimeMinutes" field.
+func (m *TitleMutation) SetRuntimeMinutes(i int) {
+	m.runtimeMinutes = &i
+	m.addruntimeMinutes = nil
+}
+
+// RuntimeMinutes returns the value of the "runtimeMinutes" field in the mutation.
+func (m *TitleMutation) RuntimeMinutes() (r int, exists bool) {
+	v := m.runtimeMinutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRuntimeMinutes returns the old "runtimeMinutes" field's value of the Title entity.
+// If the Title object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TitleMutation) OldRuntimeMinutes(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRuntimeMinutes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRuntimeMinutes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRuntimeMinutes: %w", err)
+	}
+	return oldValue.RuntimeMinutes, nil
+}
+
+// AddRuntimeMinutes adds i to the "runtimeMinutes" field.
+func (m *TitleMutation) AddRuntimeMinutes(i int) {
+	if m.addruntimeMinutes != nil {
+		*m.addruntimeMinutes += i
+	} else {
+		m.addruntimeMinutes = &i
+	}
+}
+
+// AddedRuntimeMinutes returns the value that was added to the "runtimeMinutes" field in this mutation.
+func (m *TitleMutation) AddedRuntimeMinutes() (r int, exists bool) {
+	v := m.addruntimeMinutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRuntimeMinutes resets all changes to the "runtimeMinutes" field.
+func (m *TitleMutation) ResetRuntimeMinutes() {
+	m.runtimeMinutes = nil
+	m.addruntimeMinutes = nil
+}
+
+// SetGenre sets the "genre" field.
+func (m *TitleMutation) SetGenre(s []string) {
+	m.genre = &s
+}
+
+// Genre returns the value of the "genre" field in the mutation.
+func (m *TitleMutation) Genre() (r []string, exists bool) {
+	v := m.genre
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGenre returns the old "genre" field's value of the Title entity.
+// If the Title object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TitleMutation) OldGenre(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGenre is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGenre requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGenre: %w", err)
+	}
+	return oldValue.Genre, nil
+}
+
+// ResetGenre resets all changes to the "genre" field.
+func (m *TitleMutation) ResetGenre() {
+	m.genre = nil
+}
+
+// Where appends a list predicates to the TitleMutation builder.
+func (m *TitleMutation) Where(ps ...predicate.Title) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *TitleMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Title).
+func (m *TitleMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TitleMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.tconst != nil {
+		fields = append(fields, title.FieldTconst)
+	}
+	if m.titleType != nil {
+		fields = append(fields, title.FieldTitleType)
+	}
+	if m.primaryTitle != nil {
+		fields = append(fields, title.FieldPrimaryTitle)
+	}
+	if m.originalTitle != nil {
+		fields = append(fields, title.FieldOriginalTitle)
+	}
+	if m.isAdult != nil {
+		fields = append(fields, title.FieldIsAdult)
+	}
+	if m.startYear != nil {
+		fields = append(fields, title.FieldStartYear)
+	}
+	if m.endYear != nil {
+		fields = append(fields, title.FieldEndYear)
+	}
+	if m.runtimeMinutes != nil {
+		fields = append(fields, title.FieldRuntimeMinutes)
+	}
+	if m.genre != nil {
+		fields = append(fields, title.FieldGenre)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TitleMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case title.FieldTconst:
+		return m.Tconst()
+	case title.FieldTitleType:
+		return m.TitleType()
+	case title.FieldPrimaryTitle:
+		return m.PrimaryTitle()
+	case title.FieldOriginalTitle:
+		return m.OriginalTitle()
+	case title.FieldIsAdult:
+		return m.IsAdult()
+	case title.FieldStartYear:
+		return m.StartYear()
+	case title.FieldEndYear:
+		return m.EndYear()
+	case title.FieldRuntimeMinutes:
+		return m.RuntimeMinutes()
+	case title.FieldGenre:
+		return m.Genre()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TitleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case title.FieldTconst:
+		return m.OldTconst(ctx)
+	case title.FieldTitleType:
+		return m.OldTitleType(ctx)
+	case title.FieldPrimaryTitle:
+		return m.OldPrimaryTitle(ctx)
+	case title.FieldOriginalTitle:
+		return m.OldOriginalTitle(ctx)
+	case title.FieldIsAdult:
+		return m.OldIsAdult(ctx)
+	case title.FieldStartYear:
+		return m.OldStartYear(ctx)
+	case title.FieldEndYear:
+		return m.OldEndYear(ctx)
+	case title.FieldRuntimeMinutes:
+		return m.OldRuntimeMinutes(ctx)
+	case title.FieldGenre:
+		return m.OldGenre(ctx)
+	}
+	return nil, fmt.Errorf("unknown Title field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TitleMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case title.FieldTconst:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTconst(v)
+		return nil
+	case title.FieldTitleType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitleType(v)
+		return nil
+	case title.FieldPrimaryTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrimaryTitle(v)
+		return nil
+	case title.FieldOriginalTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOriginalTitle(v)
+		return nil
+	case title.FieldIsAdult:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsAdult(v)
+		return nil
+	case title.FieldStartYear:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartYear(v)
+		return nil
+	case title.FieldEndYear:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndYear(v)
+		return nil
+	case title.FieldRuntimeMinutes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRuntimeMinutes(v)
+		return nil
+	case title.FieldGenre:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGenre(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Title field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TitleMutation) AddedFields() []string {
+	var fields []string
+	if m.addstartYear != nil {
+		fields = append(fields, title.FieldStartYear)
+	}
+	if m.addendYear != nil {
+		fields = append(fields, title.FieldEndYear)
+	}
+	if m.addruntimeMinutes != nil {
+		fields = append(fields, title.FieldRuntimeMinutes)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TitleMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case title.FieldStartYear:
+		return m.AddedStartYear()
+	case title.FieldEndYear:
+		return m.AddedEndYear()
+	case title.FieldRuntimeMinutes:
+		return m.AddedRuntimeMinutes()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TitleMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case title.FieldStartYear:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStartYear(v)
+		return nil
+	case title.FieldEndYear:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddEndYear(v)
+		return nil
+	case title.FieldRuntimeMinutes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRuntimeMinutes(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Title numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TitleMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TitleMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TitleMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Title nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TitleMutation) ResetField(name string) error {
+	switch name {
+	case title.FieldTconst:
+		m.ResetTconst()
+		return nil
+	case title.FieldTitleType:
+		m.ResetTitleType()
+		return nil
+	case title.FieldPrimaryTitle:
+		m.ResetPrimaryTitle()
+		return nil
+	case title.FieldOriginalTitle:
+		m.ResetOriginalTitle()
+		return nil
+	case title.FieldIsAdult:
+		m.ResetIsAdult()
+		return nil
+	case title.FieldStartYear:
+		m.ResetStartYear()
+		return nil
+	case title.FieldEndYear:
+		m.ResetEndYear()
+		return nil
+	case title.FieldRuntimeMinutes:
+		m.ResetRuntimeMinutes()
+		return nil
+	case title.FieldGenre:
+		m.ResetGenre()
+		return nil
+	}
+	return fmt.Errorf("unknown Title field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TitleMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TitleMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TitleMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TitleMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TitleMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TitleMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TitleMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Title unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TitleMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Title edge %s", name)
 }

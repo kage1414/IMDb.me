@@ -65,6 +65,18 @@ func (nu *NameUpdate) AddDeathYear(i int) *NameUpdate {
 	return nu
 }
 
+// SetPrimaryProfession sets the "primaryProfession" field.
+func (nu *NameUpdate) SetPrimaryProfession(s []string) *NameUpdate {
+	nu.mutation.SetPrimaryProfession(s)
+	return nu
+}
+
+// SetKnownForTitles sets the "knownForTitles" field.
+func (nu *NameUpdate) SetKnownForTitles(s []string) *NameUpdate {
+	nu.mutation.SetKnownForTitles(s)
+	return nu
+}
+
 // Mutation returns the NameMutation object of the builder.
 func (nu *NameUpdate) Mutation() *NameMutation {
 	return nu.mutation
@@ -205,6 +217,20 @@ func (nu *NameUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: name.FieldDeathYear,
 		})
 	}
+	if value, ok := nu.mutation.PrimaryProfession(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: name.FieldPrimaryProfession,
+		})
+	}
+	if value, ok := nu.mutation.KnownForTitles(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: name.FieldKnownForTitles,
+		})
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, nu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{name.Label}
@@ -259,6 +285,18 @@ func (nuo *NameUpdateOne) SetDeathYear(i int) *NameUpdateOne {
 // AddDeathYear adds i to the "deathYear" field.
 func (nuo *NameUpdateOne) AddDeathYear(i int) *NameUpdateOne {
 	nuo.mutation.AddDeathYear(i)
+	return nuo
+}
+
+// SetPrimaryProfession sets the "primaryProfession" field.
+func (nuo *NameUpdateOne) SetPrimaryProfession(s []string) *NameUpdateOne {
+	nuo.mutation.SetPrimaryProfession(s)
+	return nuo
+}
+
+// SetKnownForTitles sets the "knownForTitles" field.
+func (nuo *NameUpdateOne) SetKnownForTitles(s []string) *NameUpdateOne {
+	nuo.mutation.SetKnownForTitles(s)
 	return nuo
 }
 
@@ -430,6 +468,20 @@ func (nuo *NameUpdateOne) sqlSave(ctx context.Context) (_node *Name, err error) 
 			Type:   field.TypeInt,
 			Value:  value,
 			Column: name.FieldDeathYear,
+		})
+	}
+	if value, ok := nuo.mutation.PrimaryProfession(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: name.FieldPrimaryProfession,
+		})
+	}
+	if value, ok := nuo.mutation.KnownForTitles(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: name.FieldKnownForTitles,
 		})
 	}
 	_node = &Name{config: nuo.config}

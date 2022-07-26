@@ -43,6 +43,18 @@ func (nc *NameCreate) SetDeathYear(i int) *NameCreate {
 	return nc
 }
 
+// SetPrimaryProfession sets the "primaryProfession" field.
+func (nc *NameCreate) SetPrimaryProfession(s []string) *NameCreate {
+	nc.mutation.SetPrimaryProfession(s)
+	return nc
+}
+
+// SetKnownForTitles sets the "knownForTitles" field.
+func (nc *NameCreate) SetKnownForTitles(s []string) *NameCreate {
+	nc.mutation.SetKnownForTitles(s)
+	return nc
+}
+
 // Mutation returns the NameMutation object of the builder.
 func (nc *NameCreate) Mutation() *NameMutation {
 	return nc.mutation
@@ -141,6 +153,12 @@ func (nc *NameCreate) check() error {
 			return &ValidationError{Name: "deathYear", err: fmt.Errorf(`ent: validator failed for field "Name.deathYear": %w`, err)}
 		}
 	}
+	if _, ok := nc.mutation.PrimaryProfession(); !ok {
+		return &ValidationError{Name: "primaryProfession", err: errors.New(`ent: missing required field "Name.primaryProfession"`)}
+	}
+	if _, ok := nc.mutation.KnownForTitles(); !ok {
+		return &ValidationError{Name: "knownForTitles", err: errors.New(`ent: missing required field "Name.knownForTitles"`)}
+	}
 	return nil
 }
 
@@ -199,6 +217,22 @@ func (nc *NameCreate) createSpec() (*Name, *sqlgraph.CreateSpec) {
 			Column: name.FieldDeathYear,
 		})
 		_node.DeathYear = value
+	}
+	if value, ok := nc.mutation.PrimaryProfession(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: name.FieldPrimaryProfession,
+		})
+		_node.PrimaryProfession = value
+	}
+	if value, ok := nc.mutation.KnownForTitles(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: name.FieldKnownForTitles,
+		})
+		_node.KnownForTitles = value
 	}
 	return _node, _spec
 }

@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Name is the client for interacting with the Name builders.
 	Name *NameClient
+	// Title is the client for interacting with the Title builders.
+	Title *TitleClient
 
 	// lazily loaded.
 	client     *Client
@@ -150,6 +152,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Name = NewNameClient(tx.config)
+	tx.Title = NewTitleClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
