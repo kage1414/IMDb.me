@@ -22,4 +22,7 @@ func (Crew) Fields() []ent.Field {
 // Edges of the Crew.
 func (Crew) Edges() []ent.Edge {
 	return nil
+	// return []ent.Edge{
+	// 	edge.To("directors", Director.Type),
+	// }
 }
