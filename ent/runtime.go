@@ -3,7 +3,11 @@
 package ent
 
 import (
+	"imdb-db/ent/akas"
+	"imdb-db/ent/episode"
 	"imdb-db/ent/name"
+	"imdb-db/ent/principals"
+	"imdb-db/ent/ratings"
 	"imdb-db/ent/schema"
 	"imdb-db/ent/title"
 )
@@ -12,6 +16,22 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	akasFields := schema.Akas{}.Fields()
+	_ = akasFields
+	// akasDescOrdering is the schema descriptor for ordering field.
+	akasDescOrdering := akasFields[1].Descriptor()
+	// akas.OrderingValidator is a validator for the "ordering" field. It is called by the builders before save.
+	akas.OrderingValidator = akasDescOrdering.Validators[0].(func(int) error)
+	episodeFields := schema.Episode{}.Fields()
+	_ = episodeFields
+	// episodeDescSeasonNumber is the schema descriptor for seasonNumber field.
+	episodeDescSeasonNumber := episodeFields[2].Descriptor()
+	// episode.SeasonNumberValidator is a validator for the "seasonNumber" field. It is called by the builders before save.
+	episode.SeasonNumberValidator = episodeDescSeasonNumber.Validators[0].(func(int) error)
+	// episodeDescEpisodeNumber is the schema descriptor for episodeNumber field.
+	episodeDescEpisodeNumber := episodeFields[3].Descriptor()
+	// episode.EpisodeNumberValidator is a validator for the "episodeNumber" field. It is called by the builders before save.
+	episode.EpisodeNumberValidator = episodeDescEpisodeNumber.Validators[0].(func(int) error)
 	nameFields := schema.Name{}.Fields()
 	_ = nameFields
 	// nameDescBirthYear is the schema descriptor for birthYear field.
@@ -22,6 +42,18 @@ func init() {
 	nameDescDeathYear := nameFields[3].Descriptor()
 	// name.DeathYearValidator is a validator for the "deathYear" field. It is called by the builders before save.
 	name.DeathYearValidator = nameDescDeathYear.Validators[0].(func(int) error)
+	principalsFields := schema.Principals{}.Fields()
+	_ = principalsFields
+	// principalsDescOrdering is the schema descriptor for ordering field.
+	principalsDescOrdering := principalsFields[1].Descriptor()
+	// principals.OrderingValidator is a validator for the "ordering" field. It is called by the builders before save.
+	principals.OrderingValidator = principalsDescOrdering.Validators[0].(func(int) error)
+	ratingsFields := schema.Ratings{}.Fields()
+	_ = ratingsFields
+	// ratingsDescAverageRating is the schema descriptor for averageRating field.
+	ratingsDescAverageRating := ratingsFields[1].Descriptor()
+	// ratings.AverageRatingValidator is a validator for the "averageRating" field. It is called by the builders before save.
+	ratings.AverageRatingValidator = ratingsDescAverageRating.Validators[0].(func(float64) error)
 	titleFields := schema.Title{}.Fields()
 	_ = titleFields
 	// titleDescIsAdult is the schema descriptor for isAdult field.

@@ -8,6 +8,51 @@ import (
 )
 
 var (
+	// AkasColumns holds the columns for the "akas" table.
+	AkasColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title_id", Type: field.TypeString},
+		{Name: "ordering", Type: field.TypeInt},
+		{Name: "title", Type: field.TypeString},
+		{Name: "region", Type: field.TypeString},
+		{Name: "language", Type: field.TypeString},
+		{Name: "types", Type: field.TypeJSON},
+		{Name: "attributes", Type: field.TypeJSON},
+		{Name: "is_original_title", Type: field.TypeBool},
+	}
+	// AkasTable holds the schema information for the "akas" table.
+	AkasTable = &schema.Table{
+		Name:       "akas",
+		Columns:    AkasColumns,
+		PrimaryKey: []*schema.Column{AkasColumns[0]},
+	}
+	// CrewsColumns holds the columns for the "crews" table.
+	CrewsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "tconst", Type: field.TypeString},
+		{Name: "directors", Type: field.TypeJSON},
+		{Name: "writers", Type: field.TypeJSON},
+	}
+	// CrewsTable holds the schema information for the "crews" table.
+	CrewsTable = &schema.Table{
+		Name:       "crews",
+		Columns:    CrewsColumns,
+		PrimaryKey: []*schema.Column{CrewsColumns[0]},
+	}
+	// EpisodesColumns holds the columns for the "episodes" table.
+	EpisodesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "tconst", Type: field.TypeString},
+		{Name: "parent_tconst", Type: field.TypeString},
+		{Name: "season_number", Type: field.TypeInt},
+		{Name: "episode_number", Type: field.TypeInt},
+	}
+	// EpisodesTable holds the schema information for the "episodes" table.
+	EpisodesTable = &schema.Table{
+		Name:       "episodes",
+		Columns:    EpisodesColumns,
+		PrimaryKey: []*schema.Column{EpisodesColumns[0]},
+	}
 	// NamesColumns holds the columns for the "names" table.
 	NamesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -23,6 +68,35 @@ var (
 		Name:       "names",
 		Columns:    NamesColumns,
 		PrimaryKey: []*schema.Column{NamesColumns[0]},
+	}
+	// PrincipalsColumns holds the columns for the "principals" table.
+	PrincipalsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "tconst", Type: field.TypeString},
+		{Name: "ordering", Type: field.TypeInt},
+		{Name: "nconst", Type: field.TypeString},
+		{Name: "category", Type: field.TypeString},
+		{Name: "job", Type: field.TypeString},
+		{Name: "characters", Type: field.TypeString},
+	}
+	// PrincipalsTable holds the schema information for the "principals" table.
+	PrincipalsTable = &schema.Table{
+		Name:       "principals",
+		Columns:    PrincipalsColumns,
+		PrimaryKey: []*schema.Column{PrincipalsColumns[0]},
+	}
+	// RatingsColumns holds the columns for the "ratings" table.
+	RatingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "tconst", Type: field.TypeString},
+		{Name: "average_rating", Type: field.TypeFloat64},
+		{Name: "num_votes", Type: field.TypeInt},
+	}
+	// RatingsTable holds the schema information for the "ratings" table.
+	RatingsTable = &schema.Table{
+		Name:       "ratings",
+		Columns:    RatingsColumns,
+		PrimaryKey: []*schema.Column{RatingsColumns[0]},
 	}
 	// TitlesColumns holds the columns for the "titles" table.
 	TitlesColumns = []*schema.Column{
@@ -45,7 +119,12 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AkasTable,
+		CrewsTable,
+		EpisodesTable,
 		NamesTable,
+		PrincipalsTable,
+		RatingsTable,
 		TitlesTable,
 	}
 )

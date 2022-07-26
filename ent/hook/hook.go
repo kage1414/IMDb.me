@@ -8,6 +8,45 @@ import (
 	"imdb-db/ent"
 )
 
+// The AkasFunc type is an adapter to allow the use of ordinary
+// function as Akas mutator.
+type AkasFunc func(context.Context, *ent.AkasMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AkasFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.AkasMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AkasMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The CrewFunc type is an adapter to allow the use of ordinary
+// function as Crew mutator.
+type CrewFunc func(context.Context, *ent.CrewMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CrewFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CrewMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CrewMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The EpisodeFunc type is an adapter to allow the use of ordinary
+// function as Episode mutator.
+type EpisodeFunc func(context.Context, *ent.EpisodeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EpisodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.EpisodeMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EpisodeMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The NameFunc type is an adapter to allow the use of ordinary
 // function as Name mutator.
 type NameFunc func(context.Context, *ent.NameMutation) (ent.Value, error)
@@ -17,6 +56,32 @@ func (f NameFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	mv, ok := m.(*ent.NameMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.NameMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The PrincipalsFunc type is an adapter to allow the use of ordinary
+// function as Principals mutator.
+type PrincipalsFunc func(context.Context, *ent.PrincipalsMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PrincipalsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.PrincipalsMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PrincipalsMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The RatingsFunc type is an adapter to allow the use of ordinary
+// function as Ratings mutator.
+type RatingsFunc func(context.Context, *ent.RatingsMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RatingsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.RatingsMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RatingsMutation", m)
 	}
 	return f(ctx, mv)
 }

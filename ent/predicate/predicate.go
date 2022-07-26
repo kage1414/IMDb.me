@@ -6,8 +6,23 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Akas is the predicate function for akas builders.
+type Akas func(*sql.Selector)
+
+// Crew is the predicate function for crew builders.
+type Crew func(*sql.Selector)
+
+// Episode is the predicate function for episode builders.
+type Episode func(*sql.Selector)
+
 // Name is the predicate function for name builders.
 type Name func(*sql.Selector)
+
+// Principals is the predicate function for principals builders.
+type Principals func(*sql.Selector)
+
+// Ratings is the predicate function for ratings builders.
+type Ratings func(*sql.Selector)
 
 // Title is the predicate function for title builders.
 type Title func(*sql.Selector)
