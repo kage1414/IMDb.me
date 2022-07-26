@@ -1,4 +1,4 @@
-# imdb.me
+# IMDb.me
 Self-hosted IMDB GraphQL server written in GoLang and Javascript.
 
 Clone data from IMDb's publicly available database and run a GraphQL server to query movie and tv show data.
