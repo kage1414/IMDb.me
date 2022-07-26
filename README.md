@@ -28,7 +28,7 @@ Clone data from IMDb's publicly available database and run a GraphQL server to q
 
     Downloads database files from IMDB and inserts data into selected DBMS.
     
-        * macOS: Will install correct DBMS using `brew`
+        * macOS: Will install correct DBMS using `brew` if not already installed
         * linux: DBMS must be installed manually
         * windows: No support
         
