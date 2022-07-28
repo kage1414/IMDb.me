@@ -11,15 +11,15 @@ const {
 } = models;
 
 const tables = {
-  basics_name: new Table('basics_name', {
+  name: new Table('name', {
     url: 'https://datasets.imdbws.com/name.basics.tsv.gz',
     model: NAME,
   }),
-  basics_title: new Table('basics_title', {
+  title: new Table('title', {
     url: 'https://datasets.imdbws.com/title.basics.tsv.gz',
     model: TITLE,
   }),
-  akas: new Table('akas', {
+  akas: new Table('aka', {
     url: 'https://datasets.imdbws.com/title.akas.tsv.gz',
     model: AKAS,
   }),
@@ -31,11 +31,11 @@ const tables = {
     url: 'https://datasets.imdbws.com/title.episode.tsv.gz',
     model: EPISODE,
   }),
-  principals: new Table('principals', {
+  principals: new Table('principal', {
     url: 'https://datasets.imdbws.com/title.principals.tsv.gz',
     model: PRINCIPALS,
   }),
-  ratings: new Table('ratings', {
+  ratings: new Table('rating', {
     url: 'https://datasets.imdbws.com/title.ratings.tsv.gz',
     model: RATINGS,
   }),
