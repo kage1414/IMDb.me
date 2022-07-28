@@ -1,9 +1,15 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"imdb-db/ent"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 type name struct {
@@ -31,13 +37,42 @@ var albums = []album{
 }
 
 func main() {
+	envError := godotenv.Load(".env")
+
+	if envError != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	user := os.Getenv("IMDB_USER")
+	pass := os.Getenv("IMDB_PASS")
+
+	connectionString := fmt.Sprintf("host=localhost port=5432 user=%s dbname=imdb password=%s", user, pass)
+
+	client, err := ent.Open("postgres", connectionString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
 	router := gin.Default()
 
 	router.GET("/albums", getAlbums)
+	router.GET("/ratings", func(c *gin.Context) {
+		return getRatings(client)
+	})
 
 	router.Run("localhost:8080")
 }
 
 func getAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, albums)
+}
+
+func getRatings(client *ent.Client) []*ent.Ratings {
+	ctx := context.Background()
+	ratings, err := client.Ratings. // UserClient.
+					Query(). // User query builder.
+					All(ctx)
+	fmt.Fprintf(ratings)
+	return ratings
 }
