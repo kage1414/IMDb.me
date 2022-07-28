@@ -1,4 +1,4 @@
-require('dot-env');
+require('dotenv');
 const { IMDB_USER, IMDB_PASS, IMDB_DBMS, IMDB_HOST } =
   process.env;
 const { Sequelize, DataTypes } = require('sequelize');
@@ -18,7 +18,6 @@ const models = {
     nconst: {
       type: DataTypes.TEXT,
       allowNull: false,
-      primaryKey: true,
     },
     primaryName: {
       type: DataTypes.TEXT,
@@ -35,12 +34,19 @@ const models = {
     knownForTitles: {
       type: DataTypes.ARRAY(Sequelize.TEXT),
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   }),
   TITLE: sequelize.define('basics_title', {
     tconst: {
       type: DataTypes.TEXT,
       allowNull: false,
-      primaryKey: true,
     },
     titleType: {
       type: DataTypes.TEXT,
@@ -65,6 +71,14 @@ const models = {
     },
     genres: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   }),
   AKAS: sequelize.define('akas', {
@@ -92,11 +106,18 @@ const models = {
     isOriginalTitle: {
       type: DataTypes.BOOLEAN,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   }),
   CREW: sequelize.define('crew', {
     tconst: {
       type: DataTypes.TEXT,
-      primaryKey: true,
     },
     directors: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
@@ -104,11 +125,18 @@ const models = {
     writers: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   }),
   EPISODE: sequelize.define('episode', {
     tconst: {
       type: DataTypes.TEXT,
-      primaryKey: true,
     },
     parentTconst: {
       type: DataTypes.TEXT,
@@ -118,6 +146,14 @@ const models = {
     },
     episodeNumber: {
       type: DataTypes.INTEGER,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   }),
   PRINCIPALS: sequelize.define('principals', {
@@ -139,6 +175,14 @@ const models = {
     characters: {
       type: DataTypes.TEXT,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   }),
   RATINGS: sequelize.define('ratings', {
     tconst: {
@@ -149,6 +193,14 @@ const models = {
     },
     numVotes: {
       type: DataTypes.INTEGER,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   }),
 };

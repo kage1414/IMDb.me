@@ -4,11 +4,11 @@ module.exports = {
     commonjs: true,
     es2021: true,
   },
-  extends: ["standard", "prettier"],
+  extends: ['standard', 'prettier'],
   parserOptions: {
-    ecmaVersion: "latest",
+    ecmaVersion: 'latest',
   },
   rules: {
-    "no-unused-vars": "warn",
+    'no-unused-vars': 'warn',
   },
 };

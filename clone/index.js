@@ -1,9 +1,13 @@
 const { tables } = require('./db.js');
 const { sequelize, models } = require('./models.js');
+const firstline = require('firstline');
 const axios = require('axios');
 const gunzip = require('gunzip-file');
 const Table = require('./table.js');
+const replace = require('replace-in-file');
+const readline = require('readline');
 const path = require('path');
+const { Client } = require('pg');
 const {
   startTimer,
   addToInsertTotal,
@@ -15,6 +19,8 @@ const {
   createWriteStream,
   existsSync,
   mkdirSync,
+  rmdirSync,
+  unlink,
 } = require('fs');
 const arrayFields = [
   'genres',
@@ -27,11 +33,86 @@ const arrayFields = [
 ];
 const booleanFields = ['isAdult', 'isOriginalTitle'];
 
+const importToPostgres = async (
+  client,
+  { model, name },
+  filePath
+) => {
+  const fullPath = path.resolve(filePath);
+  const firstLine = await firstline(filePath, {
+    encoding: 'utf8',
+  });
+  const mutatedFirstLine = firstLine
+    .split('\t')
+    .map((ele) => `"${ele}"`)
+    .join(',');
+  const queryString = `COPY ${model.getTableName()}(${mutatedFirstLine}) FROM '${fullPath}' DELIMITER '\t' CSV HEADER`;
+  console.log(queryString);
+  client.query(queryString);
+};
+
+const removeNulls = async (
+  filePath,
+  { deleteExtraFiles },
+  cb
+) => {
+  const arrayIdx = [];
+  let firstLine = await firstline(filePath, {
+    encoding: 'utf8',
+  });
+  firstLine = firstLine.split('\t');
+  firstLine.forEach((header, idx) => {
+    if (arrayFields.includes(header)) {
+      arrayIdx.push(idx);
+    }
+  });
+  let newFilePath = filePath.split('.');
+  newFilePath.splice(newFilePath.length - 1, 0, 'import');
+  newFilePath = newFilePath.join('.');
+  const read = createReadStream(filePath, {
+    encoding: 'utf8',
+  });
+  const write = createWriteStream(newFilePath);
+  const rl = readline.createInterface({
+    input: read,
+    crlfDelay: Infinity,
+  });
+  let onFirstLine = true;
+  for await (const line of rl) {
+    const split = line.split('\t').map((cell, idx) => {
+      if (cell === '\\N' || cell === '\\\\N') {
+        return '';
+      }
+      if (arrayIdx.includes(idx) && !onFirstLine) {
+        const array = cell.split(',');
+        let arrayLiteral = JSON.stringify(array);
+        arrayLiteral = arrayLiteral.replace('[', '{');
+        arrayLiteral = arrayLiteral.replace(']', '}');
+        return arrayLiteral;
+      }
+      return cell;
+    });
+    write.write(split.join('\t'));
+    write.write('\n');
+    if (onFirstLine) {
+      onFirstLine = false;
+    }
+  }
+  read.on('close', () => {
+    write.close();
+    if (deleteExtraFiles) {
+      unlink(filePath, () => {});
+    }
+    cb(newFilePath);
+  });
+};
+
 const download = async ({
   url,
   zippedFileName,
   fileName,
   model,
+  cb,
 }) => {
   const zippedOutputLocationPath = path.join(
     '.',
@@ -71,86 +152,44 @@ const download = async ({
     zippedOutputLocationPath,
     outputLocationPath,
     () => {
-      countTotalRecords(outputLocationPath, {
-        deleteFile: true,
-        deleteFilePath: zippedOutputLocationPath,
-      });
-      parseFileToCSV(outputLocationPath, model);
+      unlink(zippedOutputLocationPath, () => {});
+      removeNulls(
+        outputLocationPath,
+        {
+          deleteExtraFiles: true,
+        },
+        cb
+      );
     }
   );
-};
-
-const parseFileToCSV = async (filePath, model) => {
-  let headers;
-  let left;
-
-  startTimer();
-
-  const stream = createReadStream(filePath, {
-    encoding: 'utf8',
-  });
-
-  stream.on('data', async (chunk) => {
-    stream.pause();
-    const chunkArr = chunk.split('\n');
-    if (!headers) {
-      headers = chunkArr.shift().split('\t');
-    }
-    if (left) {
-      chunkArr[0] = left + chunkArr[0];
-    }
-    left = chunkArr.pop();
-
-    for await (const rowString of chunkArr) {
-      const row = Object.fromEntries(
-        rowString.split('\t').map((cell, idx) => {
-          const key = headers[idx];
-          let value = cell;
-          if (cell === '\\N') {
-            value = null;
-          } else if (booleanFields.includes(key)) {
-            value = !!Number(value);
-          } else if (arrayFields.includes(key)) {
-            value = cell.split(',');
-          }
-          return [key, value];
-        })
-      );
-      await model
-        .create(row)
-        .then(() => {
-          addToInsertTotal(1);
-        })
-        .catch((err) => {
-          console.log('Error:', err);
-          console.log(row);
-        });
-    }
-    logProgress();
-    stream.resume();
-  });
-
-  stream.on('close', () => {
-    console.log('closed', filePath);
-  });
 };
 
 const runner = async () => {
   console.log('Cloning IMDB Database');
-  Object.values(models).forEach(async (model) => {
-    await model.drop();
+  const client = new Client({
+    user: process.env.IMDB_USER,
+    host: 'localhost',
+    database: 'imdb',
+    password: process.env.IMDB_PASS,
   });
+  await client.connect();
   await sequelize.sync();
-  if (!existsSync('temp')) {
-    mkdirSync('temp');
+  if (existsSync('temp')) {
+    rmdirSync('temp', { recursive: true });
   }
+  mkdirSync('temp');
   console.log('Downloading records');
   const tablesToScrape = Object.values(tables).filter(
     (table) => table instanceof Table
   );
-
-  tablesToScrape.forEach(download);
+  tablesToScrape.forEach(async (table) => {
+    download({
+      ...table,
+      cb: (filePath) => {
+        importToPostgres(client, table, filePath);
+      },
+    });
+  });
 };
 
-require('./createDatabase.js');
 runner();

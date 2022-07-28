@@ -13,10 +13,14 @@
     "axios": "^0.27.2",
     "countdown": "^2.6.0",
     "dot-env": "^0.0.1",
+    "dotenv": "^16.0.1",
+    "firstline": "^2.0.2",
     "gunzip-file": "^0.1.1",
+    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "moment-countdown": "^0.0.3",
     "pg": "^8.7.3",
+    "replace-in-file": "^6.3.5",
     "sequelize": "^6.21.3"
   },
   "devDependencies": {
