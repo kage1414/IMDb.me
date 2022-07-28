@@ -20,7 +20,7 @@
     "moment": "^2.29.4",
     "moment-countdown": "^0.0.3",
     "pg": "^8.7.3",
-    "replace-in-file": "^6.3.5",
+    "pg-escape": "^0.2.0",
     "sequelize": "^6.21.3"
   },
   "devDependencies": {

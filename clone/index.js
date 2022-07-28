@@ -1,10 +1,10 @@
 const { tables } = require('./db.js');
-const { sequelize, models } = require('./models.js');
+const { sequelize } = require('./models.js');
+const escape = require('pg-escape');
 const firstline = require('firstline');
 const axios = require('axios');
 const gunzip = require('gunzip-file');
 const Table = require('./table.js');
-const replace = require('replace-in-file');
 const readline = require('readline');
 const path = require('path');
 const { Client } = require('pg');
@@ -46,11 +46,15 @@ const importToPostgres = async (
     .split('\t')
     .map((ele) => `"${ele}"`)
     .join(',');
-  const queryString = `COPY ${model.getTableName()}(${mutatedFirstLine}) FROM '${fullPath}' DELIMITER '\t' CSV HEADER`;
+  const queryString = `COPY ${model.getTableName()}(${mutatedFirstLine}) FROM '${fullPath}' DELIMITER E'\t' CSV HEADER`;
   console.log(queryString);
-  await client.query(queryString);
-  console.log('Imported', name);
-  unlink(filePath, () => {});
+  try {
+    await client.query(queryString);
+    console.log('Imported', name);
+  } catch (error) {
+    console.log(error);
+  }
+  // unlink(filePath, () => {});
 };
 
 const removeNulls = async (
@@ -84,7 +88,6 @@ const removeNulls = async (
     crlfDelay: Infinity,
   });
   let onFirstLine = true;
-  const beginLogging = false;
   for await (const line of rl) {
     const split = line.split('\t').map((cell, idx) => {
       if (cell === '\\N' || cell === '\\\\N') {
@@ -92,6 +95,14 @@ const removeNulls = async (
       }
       if (booleanIdx.includes(idx) && !onFirstLine) {
         cell = !!cell;
+      }
+      if (
+        typeof cell === 'string' &&
+        !Number(cell) &&
+        cell.includes('"')
+      ) {
+        cell = escape.ident(cell);
+        console.log(cell);
       }
       if (arrayIdx.includes(idx) && !onFirstLine) {
         const array = cell.split(',');
@@ -110,10 +121,9 @@ const removeNulls = async (
     }
   }
   read.on('close', () => {
-    write.pause();
-    // write.close();
+    write.close();
     if (deleteExtraFiles) {
-      // unlink(filePath, () => {});
+      unlink(filePath, () => {});
     }
     cb(newFilePath);
   });
