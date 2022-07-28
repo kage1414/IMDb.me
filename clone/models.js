@@ -48,7 +48,7 @@ const models = {
     {
       indexes: [
         {
-          unique: true,
+          unique: false,
           fields: ['nconst'],
         },
       ],
@@ -97,7 +97,7 @@ const models = {
     {
       indexes: [
         {
-          unique: true,
+          unique: false,
           fields: ['tconst'],
         },
       ],
@@ -142,7 +142,7 @@ const models = {
     {
       indexes: [
         {
-          unique: true,
+          unique: false,
           fields: ['titleId'],
         },
       ],
@@ -172,7 +172,7 @@ const models = {
     {
       indexes: [
         {
-          unique: true,
+          unique: false,
           fields: ['tconst'],
         },
       ],
@@ -205,7 +205,7 @@ const models = {
     {
       indexes: [
         {
-          unique: true,
+          unique: false,
           fields: ['tconst'],
         },
       ],
@@ -244,7 +244,7 @@ const models = {
     {
       indexes: [
         {
-          unique: true,
+          unique: false,
           fields: ['tconst', 'nconst'],
         },
       ],
@@ -274,7 +274,7 @@ const models = {
     {
       indexes: [
         {
-          unique: true,
+          unique: false,
           fields: ['tconst'],
         },
       ],

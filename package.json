@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
+    "check-disk-space": "^3.3.1",
     "countdown": "^2.6.0",
     "dot-env": "^0.0.1",
     "dotenv": "^16.0.1",
