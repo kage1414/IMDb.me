@@ -9,12 +9,6 @@ const readline = require('readline');
 const path = require('path');
 const { Client } = require('pg');
 const {
-  startTimer,
-  addToInsertTotal,
-  countTotalRecords,
-  logProgress,
-} = require('./util.js');
-const {
   createReadStream,
   createWriteStream,
   existsSync,
