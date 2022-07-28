@@ -96,7 +96,6 @@ const removeNulls = async (
         cell.includes('"')
       ) {
         cell = escape.ident(cell);
-        console.log(cell);
       }
       if (arrayIdx.includes(idx) && !onFirstLine) {
         const array = cell.split(',');
