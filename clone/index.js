@@ -8,7 +8,6 @@ const Table = require('./table.js');
 const readline = require('readline');
 const path = require('path');
 const { Client } = require('pg');
-
 const {
   createReadStream,
   createWriteStream,
