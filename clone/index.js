@@ -109,12 +109,8 @@ const removeNulls = async (
       onFirstLine = false;
     }
   }
-  write.on('close', () => {
-    console.log('write done');
-  });
   read.on('close', () => {
     write.pause();
-    console.log('read done');
     // write.close();
     if (deleteExtraFiles) {
       // unlink(filePath, () => {});
