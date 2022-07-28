@@ -14,7 +14,7 @@ const sequelize = new Sequelize(
 );
 
 const models = {
-  NAME: sequelize.define('basics_name', {
+  NAME: sequelize.define('name', {
     nconst: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -43,7 +43,7 @@ const models = {
       allowNull: true,
     },
   }),
-  TITLE: sequelize.define('basics_title', {
+  TITLE: sequelize.define('title', {
     tconst: {
       type: DataTypes.TEXT,
       allowNull: false,

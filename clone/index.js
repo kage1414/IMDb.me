@@ -48,7 +48,9 @@ const importToPostgres = async (
     .join(',');
   const queryString = `COPY ${model.getTableName()}(${mutatedFirstLine}) FROM '${fullPath}' DELIMITER '\t' CSV HEADER`;
   console.log(queryString);
-  client.query(queryString);
+  await client.query(queryString);
+  console.log('Imported', name);
+  unlink(filePath, () => {});
 };
 
 const removeNulls = async (
@@ -57,6 +59,7 @@ const removeNulls = async (
   cb
 ) => {
   const arrayIdx = [];
+  const booleanIdx = [];
   let firstLine = await firstline(filePath, {
     encoding: 'utf8',
   });
@@ -64,6 +67,9 @@ const removeNulls = async (
   firstLine.forEach((header, idx) => {
     if (arrayFields.includes(header)) {
       arrayIdx.push(idx);
+    }
+    if (booleanFields.includes(header)) {
+      booleanIdx.push(idx);
     }
   });
   let newFilePath = filePath.split('.');
@@ -78,10 +84,14 @@ const removeNulls = async (
     crlfDelay: Infinity,
   });
   let onFirstLine = true;
+  const beginLogging = false;
   for await (const line of rl) {
     const split = line.split('\t').map((cell, idx) => {
       if (cell === '\\N' || cell === '\\\\N') {
-        return '';
+        cell = '';
+      }
+      if (booleanIdx.includes(idx) && !onFirstLine) {
+        cell = !!cell;
       }
       if (arrayIdx.includes(idx) && !onFirstLine) {
         const array = cell.split(',');
@@ -92,6 +102,7 @@ const removeNulls = async (
       }
       return cell;
     });
+
     write.write(split.join('\t'));
     write.write('\n');
     if (onFirstLine) {
