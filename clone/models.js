@@ -17,6 +17,11 @@ const models = {
   NAME: sequelize.define(
     'name',
     {
+      id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+      },
       nconst: {
         type: DataTypes.TEXT,
         allowNull: false,
@@ -51,12 +56,21 @@ const models = {
           unique: false,
           fields: ['nconst'],
         },
+        {
+          unique: true,
+          fields: ['id'],
+        },
       ],
     }
   ),
   TITLE: sequelize.define(
     'title',
     {
+      id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+      },
       tconst: {
         type: DataTypes.TEXT,
         allowNull: false,
@@ -100,12 +114,21 @@ const models = {
           unique: false,
           fields: ['tconst'],
         },
+        {
+          unique: true,
+          fields: ['id'],
+        },
       ],
     }
   ),
   AKAS: sequelize.define(
     'akas',
     {
+      id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+      },
       titleId: {
         type: DataTypes.TEXT,
       },
@@ -145,12 +168,21 @@ const models = {
           unique: false,
           fields: ['titleId'],
         },
+        {
+          unique: true,
+          fields: ['id'],
+        },
       ],
     }
   ),
   CREW: sequelize.define(
     'crew',
     {
+      id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+      },
       tconst: {
         type: DataTypes.TEXT,
       },
@@ -175,12 +207,21 @@ const models = {
           unique: false,
           fields: ['tconst'],
         },
+        {
+          unique: true,
+          fields: ['id'],
+        },
       ],
     }
   ),
   EPISODE: sequelize.define(
     'episode',
     {
+      id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+      },
       tconst: {
         type: DataTypes.TEXT,
       },
@@ -208,12 +249,21 @@ const models = {
           unique: false,
           fields: ['tconst'],
         },
+        {
+          unique: true,
+          fields: ['id'],
+        },
       ],
     }
   ),
   PRINCIPALS: sequelize.define(
     'principals',
     {
+      id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+      },
       tconst: {
         type: DataTypes.TEXT,
       },
@@ -247,12 +297,21 @@ const models = {
           unique: false,
           fields: ['tconst', 'nconst'],
         },
+        {
+          unique: true,
+          fields: ['id'],
+        },
       ],
     }
   ),
   RATINGS: sequelize.define(
     'ratings',
     {
+      id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+      },
       tconst: {
         type: DataTypes.TEXT,
       },
@@ -276,6 +335,10 @@ const models = {
         {
           unique: false,
           fields: ['tconst'],
+        },
+        {
+          unique: true,
+          fields: ['id'],
         },
       ],
     }
