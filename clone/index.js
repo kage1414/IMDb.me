@@ -48,7 +48,7 @@ const importToPostgres = async (
   } catch (error) {
     console.log(error);
   }
-  // unlink(filePath, () => {});
+  unlink(filePath, () => {});
 };
 
 const removeNulls = async (
