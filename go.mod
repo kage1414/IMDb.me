@@ -3,13 +3,13 @@ module imdb-db
 go 1.18
 
 require (
+	entgo.io/ent v0.11.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/joho/godotenv v1.4.0
 )
 
 require (
 	ariga.io/atlas v0.5.0 // indirect
-	entgo.io/ent v0.11.1 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
 	"imdb-db/ent"
 	"log"
@@ -58,7 +58,7 @@ func main() {
 
 	router.GET("/albums", getAlbums)
 	router.GET("/ratings", func(c *gin.Context) {
-		return getRatings(client)
+		getRatings(client)
 	})
 
 	router.Run("localhost:8080")
@@ -69,10 +69,11 @@ func getAlbums(c *gin.Context) {
 }
 
 func getRatings(client *ent.Client) []*ent.Ratings {
-	ctx := context.Background()
+	// ctx := context.Context
 	ratings, err := client.Ratings. // UserClient.
 					Query(). // User query builder.
-					All(ctx)
-	fmt.Fprintf(ratings)
+					All()
+	ratingsJson, jsonError := json.Marshal(ratings)
+	fmt.Println(string(ratingsJson))
 	return ratings
 }

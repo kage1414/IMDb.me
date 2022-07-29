@@ -45,10 +45,10 @@ const importToPostgres = async (
   try {
     await client.query(queryString);
     console.log('Imported', name);
+    unlink(filePath, () => {});
   } catch (error) {
     console.log(error);
   }
-  unlink(filePath, () => {});
 };
 
 const removeNulls = async (
