@@ -5,7 +5,7 @@
   "main": "scrape-imdb.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clone": "psql postgres < clone/reset_db.sql && npm install && node clone/index.js"
+    "clone": "npm install && node clone/index.js"
   },
   "author": "",
   "license": "ISC",

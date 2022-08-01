@@ -1,4 +1,4 @@
-require('dotenv');
+require('dotenv').config();
 const { IMDB_USER, IMDB_PASS, IMDB_DBMS, IMDB_HOST } =
   process.env;
 const { Sequelize, DataTypes } = require('sequelize');
